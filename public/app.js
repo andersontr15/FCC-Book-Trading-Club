@@ -113,11 +113,11 @@
         vm.error = '';
         vm.cover = '';
         vm.loading = false;
-        var owner = jwtHelper.decodeToken($window.localStorage.token).data.name || null;
+        var owner = jwtHelper.decodeToken($window.localStorage.token).data;
         vm.addBook = function() {
             if(vm.book.title) {
                 console.log(vm.book.title);
-                $http.post('/api/books/search', { title: vm.book.title, owner: owner })
+                $http.post('/api/books/search', { title: vm.book.title, owner: { name: owner.name, id: owner._id  } })
                      .then(function(response) {
                          vm.loading = true;
                          vm.book.title = '';
@@ -164,7 +164,7 @@
 
         vm.getUserBooks = function() {
             
-            $http.get('/api/books/byUser/' + tokenData.name)
+            $http.get('/api/books/byUser/' + tokenData._id)
                  .then(function(response) {
                      console.log(response);
                      vm.books = response.data

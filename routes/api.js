@@ -6,12 +6,8 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt-nodejs');
 var router = express.Router({caseSensitive: true});
 
-router.get('/books/byUser/:name', function(request, response) {
-    console.log('in books by user route');
-    if(!request.params.name) {
-        return response.status(400).send('No username supplied!');
-    }
-    Books.find( { owner: request.params.name }, function(err, books) {
+router.get('/books/byUser/:id', function(request, response) {
+    Books.find( { "owner.id": request.params.id }, function(err, books) {
         if(err) {
             console.log(err);
             return response.status(400).send(err)
@@ -63,12 +59,16 @@ router.post('/books/search', function(request, response) {
                 cover: cover,
                 title: title,
                 description: description,
-                owner: request.body.owner || null
+                owner: {
+                    name: request.body.owner.name,
+                    id: request.body.owner.id
+                }
             }
             var book = new Books();
             book.title = bookInfo.title || null;
             book.cover = bookInfo.cover || null;
-            book.owner = bookInfo.owner || null;
+            book.owner.name  = bookInfo.owner.name || null;
+            book.owner.id = bookInfo.owner.id
             book.description = bookInfo.description || null;
             book.save(function(err, doc) {
                 if(err) {

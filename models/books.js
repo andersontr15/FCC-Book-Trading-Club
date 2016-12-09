@@ -2,8 +2,15 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var BooksSchema = new Schema({
     owner: {
-        type: String,
-        required: true,
+       name: {
+           type: String,
+           required: true
+       },
+       id: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: 'User',
+          required: true   
+       }
     },
     title: {
         type: String, 
