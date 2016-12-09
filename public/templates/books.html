@@ -1,0 +1,15 @@
+<h3 ng-if="vm.loading === true">Adding your book to our database...</h3>
+<div ng-hide="vm.loading === true">
+    <h3>{{vm.title}}</h3>
+    <h4>{{vm.error}}</h4>
+    <input type="text" ng-model="vm.book.title" class="form-control" placeholder="Book title">
+    <br>
+    <button class="btn btn-primary" ng-click="vm.addBook();">Add A Book</button>
+    <hr> 
+</div>
+<h4>Current books</h4>
+<ul>
+    <li ng-repeat="book in vm.books">
+        <a href="/books/{{book._id}}">{{book.title}}</a>
+    </li>
+</ul>

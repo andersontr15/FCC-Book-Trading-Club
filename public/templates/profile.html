@@ -1,0 +1,10 @@
+<h3>{{vm.title}}</h3>
+<hr>
+<button class="btn btn-link" ng-click="vm.logout();">Logout</button>
+<hr>
+Welcome, {{vm.currentUser.name}}
+<hr>
+<ul>
+    <li ng-repeat="book in vm.books">
+        <a href="/books/{{book._id}}">{{book.title}}</a> -- {{book.createdAt | date: 'medium'}}</li>
+</ul>

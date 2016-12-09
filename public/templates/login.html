@@ -1,0 +1,8 @@
+<h3>{{vm.title}}</h3>
+<hr>
+<h4 ng-if="vm.error">{{vm.error.data.message}}</h4>
+<input type="text" class="form-control" placeholder="Name" ng-model="vm.user.name">
+<br>
+<input type="password" class="form-control" placeholder="Password" ng-model="vm.user.password">
+<br>
+<button ng-click="vm.login()"  class="btn btn-success">Login</button>
