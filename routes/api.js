@@ -6,6 +6,38 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt-nodejs');
 var router = express.Router({caseSensitive: true});
 
+router.get('/users', function(request, response) {
+    console.log('in route');
+    User.find({}).select('name').exec(function(err, users) {
+        if(err) {
+            return response.status(400).send(err)
+        }
+        console.log(users);
+        return response.status(200).json(users)
+    })
+});
+
+router.get('/users/:id', function(request, response) {
+    User.findById(request.params.id, function(err, user) {
+        if(err) {
+            return response.status(400).send(err)
+        }
+        if(!user) {
+            return response.status(400).send('No user with this id!')
+        }
+        return response.status(200).send(user);
+    })
+});
+
+router.delete('/books/:id', function(request, response) {
+    Books.remove({_id: request.params.id}, function(err, book) {
+        if(err) {
+            return response.status(400).send(err)
+        }
+        return response.status(200).send('Successfully deleted book!')
+    })
+})
+
 router.get('/books/byUser/:id', function(request, response) {
     Books.find( { "owner.id": request.params.id }, function(err, books) {
         if(err) {

@@ -4,7 +4,7 @@
     <h4>{{vm.error}}</h4>
     <input type="text" ng-model="vm.book.title" class="form-control" placeholder="Book title">
     <br>
-    <button class="btn btn-primary" ng-click="vm.addBook();">Add A Book</button>
+    <button class="btn btn-primary" ng-click="vm.addBook();" ng-disabled="!vm.book.title">Add A Book</button>
     <hr> 
 </div>
 <h4>Current books</h4>

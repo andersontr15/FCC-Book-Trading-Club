@@ -13,7 +13,6 @@
             if($window.localStorage.token && nextRoute.access.restricted === true) {
                 $http.post('/api/verify-token', { token: $window.localStorage.token })
                      .then(function(response) {
-                         console.log(response);
                          console.log('Token is valid. May continue');
                      }, function(err) {
                          console.log('err has occured');
@@ -24,7 +23,9 @@
         })
     })
 
-    app.config(function($locationProvider, $routeProvider) {
+    app.config(function($locationProvider, $routeProvider, $qProvider) {
+
+        $qProvider.errorOnUnhandledRejections(false);
 
         $locationProvider.html5Mode(true);
 
@@ -75,6 +76,24 @@
             access: {
                 restricted: false
             }
+        });
+
+        $routeProvider.when('/users', {
+            templateUrl: './templates/users.html',
+            controller: 'UsersController',
+            controllerAs: 'vm',
+            access: {
+                restricted: false
+            }
+        });
+
+        $routeProvider.when('/users/:id', {
+            templateUrl: './templates/user.html',
+            controller: 'UserController',
+            controllerAs: 'vm',
+            access: {
+                restricted: false
+            }
         })
 
         $routeProvider.otherwise('/');
@@ -86,6 +105,32 @@
     function MainController() {
         var vm = this;
         vm.title = "MainController";
+    }
+
+    app.controller('UserController', UserController);
+
+    function UserController($http, $window, $location, $routeParams) {
+        var vm = this;
+        vm.title = "UserController";
+        var id = $routeParams.id;
+        vm.user = {};
+
+        $http.get('/api/users/' + id)
+             .then(function(response) {
+                 vm.user = response.data
+             }, function(err) {
+                 console.log(err)
+             })
+    }
+
+    app.controller('UsersController', UsersController);
+
+    function UsersController($http, $window, $location) {
+        var vm = this;
+        vm.users = [];
+        $http.get('/api/users').then(function(response) {
+           vm.users = response.data;
+        });
     }
 
     app.controller('BookController', BookController);
@@ -160,6 +205,16 @@
             vm.currentUser = null;
             delete $window.localStorage.token;
             $location.path('/login');
+        }
+
+        vm.removeBook = function(id) {
+            $http.delete('/api/books/' + id)
+                 .then(function(response) {
+                     vm.getUserBooks();
+                     vm.getAllBooks();
+                 }, function(err) {
+                     console.log(err)
+                 })
         }
 
         vm.getUserBooks = function() {

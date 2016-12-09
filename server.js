@@ -32,8 +32,8 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(__dirname + '/public'));
-app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.use('/api', router);
+app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.get("*", function(request, response) {
     response.sendFile(__dirname + '/public/index.html');
 });
