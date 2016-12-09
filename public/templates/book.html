@@ -7,3 +7,14 @@
 <h5>Belongs to: {{vm.book.owner.name}}</h5>
 <hr>
 <img src="" alt="" ng-src="{{vm.book.cover}}" class="img-responsive">
+<hr>
+<input type="text" class="form-control" ng-model="vm.comment">
+<button class="btn btn-success" ng-click="vm.addComment()" ng-disabled="!vm.comment">Comment</button>
+<br>
+
+<h3>Comments</h3>
+<ul>
+    <li ng-repeat="comment in vm.book.comments">
+        {{comment.comment }} -- {{comment.user}} -- {{comment.createdAt | date: 'medium'}} -- {{ comment.stars }}
+    </li>
+</ul>

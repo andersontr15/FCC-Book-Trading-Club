@@ -34,7 +34,6 @@ var BooksSchema = new Schema({
             },
             stars: {
                 type: Number,
-                required: true,
                 default: 1
             },
             user: {

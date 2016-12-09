@@ -17,6 +17,25 @@ router.get('/users', function(request, response) {
     })
 });
 
+// router.get('/tester', function(req, res) {
+//     User.findOne({'name': 'Liam'})
+
+// // This is just chaining with mongoose
+// // Here, we select the 'comments' field
+// // to be populated
+//     .populate('books')
+
+// // finally, you just run it.
+//     .exec(function (err, client) {
+//         if (err) {
+//             console.log(err)
+//         }
+
+//         // This will now have comments embedded!
+//        console.log(client);
+//     });
+// })
+
 router.get('/users/:id', function(request, response) {
     User.findById(request.params.id, function(err, user) {
         if(err) {
@@ -36,6 +55,28 @@ router.delete('/books/:id', function(request, response) {
         }
         return response.status(200).send('Successfully deleted book!')
     })
+});
+
+router.post('/books/comment', function(request, response) {
+   var id = request.body.id;
+   var comment = request.body.comment;
+   var user = request.body.user;
+   Books.findById(id, function(err, book) {
+       if(err) {
+           return response.status(400).send(err)
+       }
+       book.comments.push({
+           comment: comment,
+           user: user,
+           stars: 1
+       });
+       book.save(function(err, res) {
+           if(err) {
+               return response.status(400).send(err)
+           }
+           return response.status(201).send(res)
+       })
+   })
 })
 
 router.get('/books/byUser/:id', function(request, response) {
@@ -102,12 +143,23 @@ router.post('/books/search', function(request, response) {
             book.owner.name  = bookInfo.owner.name || null;
             book.owner.id = bookInfo.owner.id
             book.description = bookInfo.description || null;
-            book.save(function(err, doc) {
+            book.save(function(err, bookDoc) {
                 if(err) {
                     console.log(err);
                     return response.status(400).send('Book could not be added! Pleas try again.')
                 }
-                return response.status(201).send(doc)
+                User.findById(bookInfo.owner.id, function(err, user) {
+                    if(err) {
+                        return response.status(400).send(err)
+                    }
+                    user.books.push(book);
+                    user.save(function(err, doc) {
+                        if(err) {
+                            return response.status(400).send(err)
+                        }
+                        return response.status(201).send(bookDoc)
+                    })
+                })
             })
         })
     }

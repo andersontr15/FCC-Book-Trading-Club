@@ -7,6 +7,6 @@ Welcome, {{vm.currentUser.name}}
 <ul>
     <li ng-repeat="book in vm.books">
         <a href="/books/{{book._id}}">{{book.title}}</a> -- {{book.createdAt | date: 'medium'}}
-        <button ng-click="vm.removeBook(book._id)">Delete</button>
+        <button ng-click="vm.removeBook(book._id)" class="btn btn-warning">Delete</button>
         </li>
 </ul>

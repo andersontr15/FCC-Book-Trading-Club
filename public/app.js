@@ -135,17 +135,39 @@
 
     app.controller('BookController', BookController);
 
-    function BookController($http, $location, $window, $routeParams) {
+    function BookController($http, $location, $window, $routeParams, jwtHelper) {
         var vm = this;
         vm.title = "BookController";
+        vm.comments = [];
         var id = $routeParams.id;
+        var user = jwtHelper.decodeToken($window.localStorage.token).data.name;
         vm.book = {};
-        $http.get('/api/books/' + id)
+        vm.getBook = function() {
+           $http.get('/api/books/' + id)
              .then(function(response) {
+                 console.log(response);
                  vm.book = response.data
+                 
+                 vm.commments = response.data.comments;
              }, function(err) {
                  console.log(err)
              })
+       }
+        vm.getBook();
+
+        vm.addComment = function() {
+           if(!vm.comment) {
+               console.log('No comment provided');
+           }
+           else {
+               $http.post('/api/books/comment', { id: id, comment: vm.comment, user: user } )
+                    .then(function(response) {
+                        vm.comment = '';
+                        vm.getBook();
+                    })
+           }
+
+       }
     }
 
 
@@ -161,10 +183,9 @@
         var owner = jwtHelper.decodeToken($window.localStorage.token).data;
         vm.addBook = function() {
             if(vm.book.title) {
-                console.log(vm.book.title);
+                vm.loading = true;
                 $http.post('/api/books/search', { title: vm.book.title, owner: { name: owner.name, id: owner._id  } })
                      .then(function(response) {
-                         vm.loading = true;
                          vm.book.title = '';
                          vm.getAllBooks();
                          $location.path('/books/' + response.data._id)
