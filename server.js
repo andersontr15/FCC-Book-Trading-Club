@@ -1,4 +1,4 @@
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8080;
 var db = "mongodb://localhost:27017/fcc-book-trading-club";
 var router = require('./routes/api');
 var dotenv = require('dotenv').config({verbose: true});
