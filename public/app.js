@@ -66,7 +66,7 @@
             controller: 'BooksController',
             controllerAs: 'vm',
             access: {
-                restricted: false
+                restricted: true
             }
         });
         $routeProvider.when('/books/:id', {
