@@ -93,7 +93,7 @@ router.get('/books/byUser/:id', function(request, response) {
     })
 });
 
-router.get('/books', function(request, response) {
+router.get('/books', authenticate, function(request, response) {
     Books.find({}, function(err, books) {
         if(err || books.length < 1) {
             return response.status(400).send(err)
@@ -243,5 +243,18 @@ router.post('/register', function(request, response) {
     });
 
 });
+
+function authenticate(request, response, next) {
+    var token = request.headers.authorization.split(' ')[1];
+    if(!token) {
+        return response.status(400).send('No token supplied');
+    }
+    jwt.verify(token, process.env.secret, function(err, decoded){
+        if(err) {
+            return response.status(400).send(err)
+        }
+        next()
+    })
+};
 
 module.exports = router;
