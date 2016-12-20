@@ -1,5 +1,5 @@
 var port = process.env.PORT || 8080;
-var db = "mongodb://localhost:27017/fcc-book-trading-club";
+var db = "mongodb://theo:theo@ds139438.mlab.com:39438/heroku_7g82bc9w";
 var router = require('./routes/api');
 var dotenv = require('dotenv').config({verbose: true});
 var express = require('express');
