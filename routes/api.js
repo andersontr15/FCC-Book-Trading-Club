@@ -245,9 +245,6 @@ router.post('/register', function(request, response) {
 });
 
 function authenticate(request, response, next) {
-    if(request.headers.authorization['Bearer'] === undefined || request.headers.authorization['Bearer'] === null) {
-        return response.status(400).send('No token supplied');
-    }
     var token = request.headers.authorization.split(' ')[1];
     jwt.verify(token, process.env.secret, function(err, decoded){
         if(err) {
