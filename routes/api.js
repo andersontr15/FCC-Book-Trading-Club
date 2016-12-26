@@ -132,7 +132,9 @@ router.put('/borrow/:id', function(request, response) {
 });
 
 router.get('/users/:id', function(request, response) {
-    User.findById(request.params.id).populate('books').populate('requests.borrower').exec(function(err, user) {
+    User.findById(request.params.id)
+    .populate('books')
+    .exec(function(err, user) {
         if(err) {
             console.log(err);
             return response.status(400).send(err)
@@ -174,7 +176,28 @@ router.post('/books/comment', function(request, response) {
            return response.status(201).send(res)
        })
    })
-})
+});
+
+router.get('/trades/byUser/:id', function(request, response) {
+    console.log('in trades route');
+    var id = request.params.id;
+    User.findById(id)
+        .populate('user')
+        .populate('trades')
+        .populate('book')
+        .exec(function(err, user){
+            if(err) {
+                console.log(err);
+                return response.status(400).send(err);
+            }
+            if(!user) {
+                console.log('no trades');
+                return response.status(404).send([]);
+            }
+            console.log('trades' + user);
+            return response.status(200).send(user)
+        });
+});
 
 router.get('/books/byUser/:id', function(request, response) {
     Books.find( { "owner.id": request.params.id })

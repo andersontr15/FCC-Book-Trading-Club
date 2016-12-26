@@ -230,6 +230,7 @@
         var vm = this;
         vm.title = "ProfileController";
         vm.books = [];
+        vm.trades = [];
         var tokenData = jwtHelper.decodeToken($window.localStorage.token).data;
         vm.currentUser = tokenData;
 
@@ -237,7 +238,7 @@
             vm.currentUser = null;
             delete $window.localStorage.token;
             $location.path('/login');
-        }
+        };
 
         vm.removeBook = function(id) {
             $http.delete('/api/books/' + id)
@@ -246,8 +247,8 @@
                      vm.getAllBooks();
                  }, function(err) {
                      console.log(err)
-                 })
-        }
+                 });
+        };
 
          vm.acceptTrade = function(book) {
             console.log('in accept route controller');
@@ -257,8 +258,18 @@
                     console.log(response);
                  }, function(err) {
                     console.log(err);
+                 });
+        };
+
+        vm.getUserTrades = function() {
+            $http.get('/api/trades/byUser/' + tokenData._id)
+                 .then(function(response) {
+                    console.log(response);
+                    vm.trades = response.data;
+                 }, function(err) {
+                    console.log(err)
                  })
-        }
+        };
 
         vm.getUserBooks = function() {
             
@@ -269,12 +280,14 @@
                  }, function(err) {
                      console.log(err)
                  })
-        }
+        };
+
         if(tokenData !== null) {
+             vm.getUserTrades();
              vm.getUserBooks();
-        }
+        };
        
-    }
+    };
 
     app.controller('LoginController', LoginController);
 
