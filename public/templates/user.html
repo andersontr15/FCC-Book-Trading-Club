@@ -1,3 +1,13 @@
-<h3>User page</h3>
-{{vm.user.name}}
-{{vm.user | json }}
+<div class="container" style="padding:20px;">
+	{{vm.user.name}}'s profile
+	<hr>
+	<h3>Books owned...</h3>
+	<ul>
+		<li ng-repeat="book in vm.user.books">
+			<a href="/books/{{book._id}}">{{book.title}}</a>
+			<br>
+			<button class="btn btn-success" ng-click="vm.request(book._id)">Request to borrow</button>
+			<br><br>
+		</li>
+	</ul>
+</div>

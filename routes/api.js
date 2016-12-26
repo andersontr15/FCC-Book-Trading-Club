@@ -4,7 +4,7 @@ var User = require('../models/user');
 var Books = require('../models/books');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt-nodejs');
-var router = express.Router({caseSensitive: true});
+var router = express.Router({ caseSensitive: true });
 
 router.get('/users', function(request, response) {
     console.log('in route');
@@ -17,33 +17,130 @@ router.get('/users', function(request, response) {
     })
 });
 
-// router.get('/tester', function(req, res) {
-//     User.findOne({'name': 'Liam'})
+router.put('/accept/:id', function(request, response) {
+    console.log('in accept route');
+    var bookId = request.params.id;
+    var borrower = request.body.borrower;
+    var owner = request.body.owner; 
+    Books.findOne({ _id: bookId }, function(err, book) {
+        if(err) {
+            return response.status(400).send(err);
+        }
+        if(!book) {
+            return response.status(404).send('No book found with this id');
+        }
+        book.requests.borrower = borrower;
+        book.requests.status = 2;
+        book.save(function(err, res) {
+            if(err) {
+                return response.status(400).send(err)
+            }
+            User.findById(owner, function(err, user) {
+                if(err) {
+                    return response.status(400).send(err)
+                }
+                if(!user) {
+                    return response.status(400).send('No user with this id exists');
+                }
+                for(var i = 0; i < user.trades.length; i++){
+                    if(user.trades[i].book === book._id){
+                        user.trades[i].book = book;
+                        user.requests += 1;
+                        user.save(function(err, res){
+                            if(err){
+                                return response.status(400).send(err)
+                            }
+                            User.findById(borrower, function(err, user){
+                                if(err) {
+                                    return response.status(400).send(err)
+                                }
+                                if(!user) {
+                                    return response.status(404).send('No user exists with this id ')
+                                }
+                                user.trades.push(book);
+                                user.requests += 1;
+                                user.save(function(err, res){
+                                    if(err) {
+                                        return response.status(400).send(err)
+                                    }
+                                     console.log('trade went through');
+                                     return response.status(204).send('Trade went through. status should be 2 and accepted')
+                                })
+                            })
+                        });
+                    }
+                }
+                return response.status(404).send('Trouble updating book');
 
-// // This is just chaining with mongoose
-// // Here, we select the 'comments' field
-// // to be populated
-//     .populate('books')
+            })
+        })
+    })
+});
 
-// // finally, you just run it.
-//     .exec(function (err, client) {
-//         if (err) {
-//             console.log(err)
-//         }
-
-//         // This will now have comments embedded!
-//        console.log(client);
-//     });
-// })
+router.put('/borrow/:id', function(request, response) {
+    var bookId = request.params.id;
+    var borrower = request.body.borrower;
+    var owner = request.body.owner;
+    console.log(borrower, owner);
+    Books.findOne({ _id: bookId }, function(err, book) {
+        if(err) {
+            return response.status(400).send(err);
+        }
+        if(!book) {
+            return response.status(404).send('No book found with this id');
+        }
+        book.requests.borrower = borrower;
+        book.requests.status = 1;
+        book.save(function(err, res) {
+            if(err) {
+                return response.status(400).send(err)
+            }
+            User.findById(owner, function(err, user){
+                if(err) {
+                    return response.status(400).send(err)
+                }
+                if(!user) {
+                    return response.status(404).send('No user exists with this id');
+                }
+                user.trades.push(book);
+                user.requests += 1;
+                user.save(function(err, res) {
+                    if(err) {
+                        return response.status(400).send(err)
+                    }
+                    User.findById(borrower, function(err, user){
+                        if(err) {
+                            return response.status(400).send(err)
+                        }
+                        if(!user) {
+                            return response.status(404).send('No user exists with this id ')
+                        }
+                        user.trades.push(book);
+                        user.requests += 1;
+                        user.save(function(err, res){
+                            if(err) {
+                                return response.status(400).send(err)
+                            }
+                             console.log('trade went through');
+                             return response.status(204).send('Trade went through. in request mode')
+                        })
+                    })
+                })
+            })
+        })
+    })
+});
 
 router.get('/users/:id', function(request, response) {
-    User.findById(request.params.id, function(err, user) {
+    User.findById(request.params.id).populate('books').populate('requests.borrower').exec(function(err, user) {
         if(err) {
+            console.log(err);
             return response.status(400).send(err)
         }
         if(!user) {
             return response.status(400).send('No user with this id!')
         }
+        console.log('User is ' + user);
         return response.status(200).send(user);
     })
 });
@@ -80,18 +177,19 @@ router.post('/books/comment', function(request, response) {
 })
 
 router.get('/books/byUser/:id', function(request, response) {
-    Books.find( { "owner.id": request.params.id }, function(err, books) {
-        if(err) {
-            console.log(err);
-            return response.status(400).send(err)
-        }
-        if(!books) {
-            return response.status(400).send('No books for this user!')
-        }
-        console.log(books);
-        return response.status(200).send(books)
-    })
-});
+    Books.find( { "owner.id": request.params.id })
+         .populate('owner.id books requests.borrower')
+         .exec(function(err, books) {
+            if(err) {
+                console.log(err);
+                return response.status(400).send(err)
+            }
+            if(!books) {
+                return response.status(400).send('No books for this user!')
+            }
+            return response.status(200).send(books)
+        })
+    });
 
 router.get('/books', authenticate, function(request, response) {
     Books.find({}, function(err, books) {
@@ -250,8 +348,8 @@ function authenticate(request, response, next) {
         if(err) {
             return response.status(400).send(err)
         }
-        next()
-    })
+        next();
+    });
 };
 
 module.exports = router;

@@ -109,11 +109,13 @@
 
     app.controller('UserController', UserController);
 
-    function UserController($http, $window, $location, $routeParams) {
+    function UserController($http, $window, $location, $routeParams, jwtHelper) {
         var vm = this;
         vm.title = "UserController";
         var id = $routeParams.id;
         vm.user = {};
+
+        var currentUser = jwtHelper.decodeToken($window.localStorage.token).data;
 
         $http.get('/api/users/' + id)
              .then(function(response) {
@@ -121,6 +123,15 @@
              }, function(err) {
                  console.log(err)
              })
+
+        vm.request = function(book) {
+            $http.put('/api/borrow/' + book, { owner: $routeParams.id, borrower: currentUser._id  })
+                 .then(function(response) {
+                    console.log(response);
+                 }, function(err) {
+                    console.log(err);
+                 })
+        }
     }
 
     app.controller('UsersController', UsersController);
@@ -215,7 +226,7 @@
 
     app.controller('ProfileController', ProfileController);
 
-    function ProfileController($http, jwtHelper, $window, $location) {
+    function ProfileController($http, jwtHelper, $window, $location, $routeParams) {
         var vm = this;
         vm.title = "ProfileController";
         vm.books = [];
@@ -235,6 +246,17 @@
                      vm.getAllBooks();
                  }, function(err) {
                      console.log(err)
+                 })
+        }
+
+         vm.acceptTrade = function(book) {
+            console.log('in accept route controller');
+            console.log(book);
+            $http.put('/api/accept/' + book._id, { owner: book.owner.id, borrower: book.requests.borrower._id })
+                 .then(function(response) {
+                    console.log(response);
+                 }, function(err) {
+                    console.log(err);
                  })
         }
 

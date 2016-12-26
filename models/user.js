@@ -12,13 +12,20 @@ var UserSchema = new Schema({
     },
     books: [{
         type: mongoose.Schema.Types.ObjectId, ref: 'Books'
-    }]
+    }],
+    trades: [{
+        book: { type: mongoose.Schema.Types.ObjectId, ref: 'Books' }
+    }],
+    requests: {
+        type: Number,
+        default: 0
+    }
 });
 
 UserSchema.pre('save', function(next) {
     console.log('Saving document');
-    next()
-})
+    next();
+});
 
 var Model = mongoose.model('User', UserSchema);
 

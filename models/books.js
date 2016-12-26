@@ -12,6 +12,10 @@ var BooksSchema = new Schema({
           required: true   
        }
     },
+    requests: {
+        borrower: { type: mongoose.SchemaTypes.ObjectId, ref: 'User'},
+        status: { type: Number, default: 0 }
+    },
     title: {
         type: String, 
         required: true

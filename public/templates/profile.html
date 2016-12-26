@@ -4,9 +4,24 @@
 <hr>
 Welcome, {{vm.currentUser.name}}
 <hr>
+<h5>Books you have borrowed</h5>
+{{vm.currentUser | json }}
+<ul>
+	<li></li>
+</ul>
+<hr>
+<h5>Books you own..</h5>
 <ul>
     <li ng-repeat="book in vm.books">
         <a href="/books/{{book._id}}">{{book.title}}</a> -- {{book.createdAt | date: 'medium'}}
-        <button ng-click="vm.removeBook(book._id)" class="btn btn-warning">Delete</button>
-        </li>
+        <button ng-click="vm.removeBook(book._id)" class="btn btn-warning" ng-if="book.request.status < 2">Delete</button>
+        <div ng-if="book.requests.status === 0">not requested</div>
+	    <div ng-if="book.requests.status === 1">requested by {{book.requests.borrower.name}}
+	    </div>
+	    <div ng-if="book.requests.status === 2">Checked out to {{book.requests.borrower.name}}
+	    </div>
+		<button ng-if="book.requests.status < 2" ng-click="vm.acceptTrade(book)">Accept</button>
+		<button ng-if="book.requests.status < 2" ng-click="vm.refuseTrade(book)">Refuse</button>
+	    </div>
+    </li>
 </ul>
