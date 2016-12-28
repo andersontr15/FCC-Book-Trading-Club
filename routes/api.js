@@ -6,6 +6,39 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt-nodejs');
 var router = express.Router({ caseSensitive: true });
 
+router.put('/users/:id', function(request, response) {
+
+    if(!request.body.city || !request.body.state){
+        return response.status(400).send('Please fill out all fields');
+    }
+
+    console.log('updating user info');
+
+    User.findById(request.params.id, function(err, user) {
+        if(err) {
+            return response.status(400).send(err)
+        }
+        if(!user) {
+            return response.status(404).send('No user found!');
+        }
+        user.state = request.body.state;
+        user.city = request.body.city;
+        user.name = request.body.name;
+        user.save(function(err, resource) {
+            if(err) {
+                return response.status(400).send(err);
+            }
+            else {
+                var token = jwt.sign({
+                data: resource
+            }, process.env.secret, { expiresIn: 3600 });
+            return response.status(200).send(token)
+            }
+        })
+    });
+
+});
+
 router.get('/users', function(request, response) {
     console.log('in route');
     User.find({}).select('name').exec(function(err, users) {

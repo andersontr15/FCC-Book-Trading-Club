@@ -240,6 +240,16 @@
             $location.path('/login');
         };
 
+        vm.updateLocation = function() {
+            $http.put('/api/users/' + vm.currentUser._id, { city: vm.currentUser.city, state: vm.currentUser.state, name: vm.currentUser.name })
+                 .then(function(response) {
+                    console.log(response);
+                    $window.localStorage.token = response.data;
+                 }, function(err) {
+                    console.log(err)
+                 })
+        }
+
         vm.removeBook = function(id) {
             $http.delete('/api/books/' + id)
                  .then(function(response) {

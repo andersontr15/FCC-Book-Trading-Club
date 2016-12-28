@@ -19,6 +19,12 @@ var UserSchema = new Schema({
     requests: {
         type: Number,
         default: 0
+    },
+    city: {
+        type: String
+    },
+    state: {
+        type: String
     }
 });
 
