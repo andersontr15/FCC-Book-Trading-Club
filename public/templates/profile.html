@@ -4,7 +4,9 @@
 <hr>
 Welcome, {{vm.currentUser.name}}
 <hr>
-<h3>Upate your location</h3>
+<span ng-if="vm.message">{{vm.message}}</span>
+<hr>
+<h3>Upate your information</h3>
 <label for="">Your name</label>
 <input type="text" style="width:200px;" ng-model="vm.currentUser.name" class="form-control" >
 <br>
@@ -14,7 +16,7 @@ Welcome, {{vm.currentUser.name}}
 <label for="">Your state</label>
 <input type="text" style="width:200px;" ng-model="vm.currentUser.state" class="form-control">
 <br>
-<button style="width:200px;" ng-click="vm.updateLocation()" class="btn btn-success">Update</button>
+<button id="update" style="width:200px;" ng-click="vm.updateLocation()" class="btn btn-success">Update</button>
 <hr>
 <h5>Books you have borrowed</h5>
 {{vm.currentUser.trades | json }}

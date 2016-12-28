@@ -226,14 +226,13 @@
 
     app.controller('ProfileController', ProfileController);
 
-    function ProfileController($http, jwtHelper, $window, $location, $routeParams) {
+    function ProfileController($http, jwtHelper, $window, $location, $routeParams, $timeout) {
         var vm = this;
         vm.title = "ProfileController";
         vm.books = [];
         vm.trades = [];
         var tokenData = jwtHelper.decodeToken($window.localStorage.token).data;
         vm.currentUser = tokenData;
-
         vm.logout = function() {
             vm.currentUser = null;
             delete $window.localStorage.token;
@@ -243,7 +242,11 @@
         vm.updateLocation = function() {
             $http.put('/api/users/' + vm.currentUser._id, { city: vm.currentUser.city, state: vm.currentUser.state, name: vm.currentUser.name })
                  .then(function(response) {
-                    console.log(response);
+                    var btn = document.getElementById('update');
+                    btn.innerHTML = 'Updated!'
+                    $timeout(function() {
+                        btn.innerHTML = 'Update';
+                    }, 5000);
                     $window.localStorage.token = response.data;
                  }, function(err) {
                     console.log(err)
